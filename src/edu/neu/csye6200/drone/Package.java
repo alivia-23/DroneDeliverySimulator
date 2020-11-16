@@ -5,13 +5,26 @@ import java.util.List;
 
 public class Package {
 	
-	private enum Status {
+	public enum Status {
 		UNDELIVERED, IN_TRANSIT, DELIVERED
 	}
 	
 	private Location destination;
 	private double weight;
 	private String packageID;
+	Status status;
+	
+	private List<Location> path;
+
+	public Package(String packageID, Location pickup, Location destination, double weight) {
+		this.packageID = packageID;
+		this.pickup = pickup;
+		this.destination = destination;
+		this.weight = weight;
+		this.status = Status.UNDELIVERED;
+		path = new ArrayList<>();
+	}
+	
 	/**
 	 * @return the weight
 	 */
@@ -66,19 +79,6 @@ public class Package {
 	 */
 	public void setPath(List<Location> path) {
 		this.path = path;
-	}
-
-	Status status;
-	
-	private List<Location> path;
-
-	public Package(String packageID, Location pickup, Location destination, double weight) {
-		this.packageID = packageID;
-		this.pickup = pickup;
-		this.destination = destination;
-		this.weight = weight;
-		this.status = Status.UNDELIVERED;
-		path = new ArrayList<>();
 	}
 	
 	private Location pickup;

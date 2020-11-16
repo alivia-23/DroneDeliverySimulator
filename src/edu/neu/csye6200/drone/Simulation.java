@@ -2,6 +2,7 @@
 package edu.neu.csye6200.drone;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,8 @@ public class Simulation {
 		createDeliveryMap();
 		createPackages();
 		createDrones();
-		assignPackageToDrones();
+		//assignPackageToDrones();
+		assignUndeliPackToDrone(packages, drones);
 		
 		
 		
@@ -63,7 +65,7 @@ public class Simulation {
 					drone.setProjectedPath(path);
 					drone.setCurrentIndex(0);
 				}
-				Thread.sleep(5000);
+				Thread.sleep(2000);
 			}
 			time++;
 			System.out.println("****************************************");
@@ -86,6 +88,8 @@ public class Simulation {
 		packages.add(p0);
 		Package p1 = new Package("P345", deliveryMap[0][2], deliveryMap[2][0], 8);
 		packages.add(p1);
+		Package p3 = new Package("P345", deliveryMap[1][0], deliveryMap[1][2], 8);
+		packages.add(p3);
 		return packages;	
 	}
 	
@@ -94,6 +98,8 @@ public class Simulation {
 		Drone d0 = new Drone("D0-123", 10.0, rule);
 		drones.add(d0);
 		Drone d1 = new Drone("D1-234", 8.0, rule);
+		drones.add(d1);
+		Drone d2 = new Drone("D1-345", 20.0, rule);
 		drones.add(d1);
 	}
 	
@@ -119,7 +125,61 @@ public class Simulation {
 		List<Location> path1 = PathUtil.getPath(deliveryMap, pkg1.getPickup(), pkg1.getDestination(), drone1.getMovementRule().getDirections());
 		drone1.setProjectedPath(path1);
 		drone1.setCurrentIndex(0);
-
-
+	}
+	
+	public List<Drone> getAvailableDrones(List<Drone> drones) {
+		List<Drone> availableDrones = new ArrayList<Drone>();
+		for (Drone drone : drones) {
+			if (drone.getStatus() == Drone.Status.AVAILABLE) {
+				availableDrones.add(drone);
+			}
+		}
+		return availableDrones;
+	}
+	
+	public List<Package> getUndeliveredPackages(List<Package> packages) {
+		List<Package> availablePackages = new ArrayList<>();
+		for (Package parcel : packages) {
+			if (parcel.getStatus() == Package.Status.UNDELIVERED) {
+				availablePackages.add(parcel);
+			}
+		}
+		return availablePackages;
+	}
+	
+	public void assignUndeliPackToDrone(List<Package> packages, List<Drone> drones) {
+		List<Package> undeliveredPackages = getUndeliveredPackages(packages);
+		List<Drone> availableDrones = getAvailableDrones(drones);
+		
+		Collections.sort(undeliveredPackages, (a, b) -> a.getWeight() < b.getWeight() ? -1 : 1);
+		Collections.sort(availableDrones, (a, b) -> a.getCargoCapacity() < b.getCargoCapacity() ? -1 : 1);
+		
+		int pkgPtr = 0, drnPtr = 0;
+		int pkgSize = packages.size();
+		int drnSize = drones.size();
+		while (pkgPtr < pkgSize && drnPtr < drnSize) {
+          double pkgWt = undeliveredPackages.get(pkgPtr).getWeight();
+		  double cargoCapacity = availableDrones.get(drnPtr).getCargoCapacity();
+			if (pkgWt <= cargoCapacity) {
+				availableDrones.get(drnPtr).setPkg(undeliveredPackages.get(pkgPtr));
+				availableDrones.get(drnPtr).setStatus(Drone.Status.UNAVAILABLE);
+				undeliveredPackages.get(pkgPtr).setStatus(Package.Status.IN_TRANSIT);
+				setInitialPath(availableDrones.get(drnPtr));
+				pkgPtr++;
+				drnPtr++;
+			} else {
+				drnPtr++;
+			}
+		}
+	}
+	
+	public void setInitialPath(Drone drone) {
+		List<Location> path = PathUtil.getPath(deliveryMap, drone.getPkg().getPickup(), drone.getPkg().getDestination(), drone.getMovementRule().getDirections());
+		drone.setProjectedPath(path);
+		drone.setCurrentIndex(0);
+		
+		/*Location currentLocation = drone.getProjectedPath().get(drone.getCurrentIndex());
+		drone.addToActualPath(currentLocation);
+		drone.getPkg().addLoctionToPath(currentLocation);*/
 	}
 }
