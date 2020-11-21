@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.neu.csye6200.drone.newutil.PathUtil;
+import edu.neu.csye6200.drone.util.PathUtil;
 import edu.neu.csye6200.drone.rules.MovementRule;
 import edu.neu.csye6200.drone.rules.MovementRule2;
 
@@ -86,7 +86,7 @@ public class Simulation {
 	public List<Package> createPackages() {
 		Package p0 = new Package("P123", deliveryMap[0][0], deliveryMap[2][2], 10);
 		packages.add(p0);
-		Package p1 = new Package("P345", deliveryMap[0][2], deliveryMap[2][0], 8);
+		Package p1 = new Package("P234", deliveryMap[0][2], deliveryMap[2][0], 8);
 		packages.add(p1);
 		Package p3 = new Package("P345", deliveryMap[1][0], deliveryMap[1][2], 8);
 		packages.add(p3);
@@ -100,7 +100,7 @@ public class Simulation {
 		Drone d1 = new Drone("D1-234", 8.0, rule);
 		drones.add(d1);
 		Drone d2 = new Drone("D1-345", 20.0, rule);
-		drones.add(d1);
+		drones.add(d2);
 	}
 	
 	public void assignPackageToDrones() {
