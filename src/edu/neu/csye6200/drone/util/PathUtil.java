@@ -5,44 +5,47 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import edu.neu.csye6200.drone.Drone;
 import edu.neu.csye6200.drone.Location;
 
+/**
+ * 
+ * Utility class for drone path
+ *
+ */
 public class PathUtil {
 	
-	static final String DIAG_TRANSITION = "dt";
-	static final String HV_TRANSITION = "hv";
 	static final double UNIT_HV_PATHCOST = 1.00;
 	static final double UNIT_DIAG_PATHCOST = 1.50;
+	static final double UNIT_HOVER_PATHCOST = .75;
 	
-	static final int[][] HV_DIRECTIONS = new int[][] {
-		{1,0},
-		{-1,0},
-		{0,1},
-		{0,-1},
-	};
+	/**
+	 * Default Constructor
+	 */
+	public PathUtil() {}
 	
-	static final int[][] DIAG_DIRECTIONS = new int[][] {
-		{-1, 1},
-		{1,-1},
-		{-1,-1},
-		{1, 1}
-	};
-	
-	static final int[][] ALL_DIRECTIONS = new int[][] {
-		{1,0},
-		{-1,0},
-		{0,1},
-		{0,-1},
-		{-1, 1},
-		{1,-1},
-		{-1,-1},
-		{1, 1}
-	};
-
-	public PathUtil() {
-		// TODO Auto-generated constructor stub
+	/**
+	 * Reset the projected path for the drone
+	 * @param deliveryMap The delivery map
+	 * @param drone The drone for which the projected path is calculated
+	 */
+	public static void resetPathForDrone(Location[][] deliveryMap, Drone drone) {
+		List<Location> path = PathUtil.getPath(deliveryMap, drone.getPkg().getPickup(), drone.getPkg().getDestination(), drone.getRule().getDirections());
+		drone.setProjectedPath(path);
+		drone.setCurrentIndex(0);
 	}
 	
+	/**
+	 * 
+	 * Calculate path from source to destination
+	 * 
+	 * @param deliveryMap The delivery map
+	 * @param source Source location
+	 * @param destination Destination location
+	 * @param directions Directions in which the drone is allowed to move
+	 * 
+	 * @return The list of locations to be traversed to reach from source to destination
+	 */
 	public static List<Location> getPath(Location[][] deliveryMap, Location source, Location destination, int[][] directions) {
 		Location dest = getShortestPath(deliveryMap, source, destination, directions);
 		List<Location> path = new ArrayList<>();
@@ -62,21 +65,25 @@ public class PathUtil {
 		return path;
 	}
 	
-	public static void printPath(List<Location> path) {
-		for (Location l : path) {
-			System.out.println(l);
-		}
-	}
-    
+
+	/**
+	 * 
+	 * Calculate 'shortest' path from source to destination
+	 * 
+	 * @param deliveryMap The delivery map
+	 * @param source Source location
+	 * @param destination Destination location
+	 * @param directions Directions in which the drone is allowed to move
+	 * 
+	 * @return The list of locations to be traversed to reach from source to destination
+	 */
     private static Location getShortestPath(Location[][] deliveryMap, Location source, Location destination, int[][] directions) {
     	
     	boolean[][] visited = new boolean[deliveryMap.length][deliveryMap[0].length];
 		Queue<Location> q = new LinkedList<>();
 		q.offer(source);
 		visited[source.x][source.y] = true;
-		
-		
-			
+				
 		while (!q.isEmpty()) {
 			Location current = q.poll();
 			if (current.x == destination.x && current.y == destination.y) {
@@ -100,16 +107,23 @@ public class PathUtil {
 		return null;
 	}
     
-    public static double findPathCost(List<Location> path) {
-    	
+    /**
+     * Calculate the cost of delivery per kg
+     * 
+     * @param path list of locations traversed by the drone
+     * @return Cost of delivery per kg
+     */
+    public static double findPathCostPerKg(List<Location> path) {  	
     	double pathCost = 0;
     	for (int i = 0; i < path.size() - 1; i++) {
     		Location first = path.get(i);
     		Location second = path.get(i+1);
-    		String type = getTransitionType(first, second);
-    		if (type.equals(DIAG_TRANSITION)) {
+    		
+    		if(( first.x == second.x ) && (first.y == second.y)) { // hover
+    			pathCost += UNIT_HOVER_PATHCOST;
+    		} else if (Math.abs(first.x - second.x ) == 1 && Math.abs(first.y - second.y) == 1) { // diagonal
     			pathCost += UNIT_DIAG_PATHCOST;
-    		} else {
+    		} else {                       // horizontal / vertical
     			pathCost += UNIT_HV_PATHCOST;
     		}
     	}
@@ -117,21 +131,38 @@ public class PathUtil {
     	return pathCost;
     }
     
-    private static String getTransitionType(Location first, Location second) {
-    	if (Math.abs(first.x - second.x ) == 1 && Math.abs(first.y - second.y) == 1) {
-    		return DIAG_TRANSITION;
-    	} else {
-    		return HV_TRANSITION;
-    	}
-    	
-    }
     
+    /**
+     * Check if the location (x,y) is valid
+     * @param x x co-ordinate of the location
+     * @param y y co-ordinate of the location
+     * @param deliveryMap The deliveryMap
+     * @return
+     */
     private static boolean isValid(int x, int y, Location[][] deliveryMap) {
-    	if (x < 0 || x >=  deliveryMap.length || y < 0 || y >= deliveryMap.length) {
+    	if (x < 0 || x >=  deliveryMap.length || y < 0 || y >= deliveryMap[0].length) {
     		return false;
     	}
     	return true;
     }
-	 
+    
+    /**
+     * 
+     * Calculates the hover time of a drone on the same location
+     * 
+     * @param actualPath list of locations traversed by the drone
+     * @return The hover time
+     */
+    public static int getHoverTime(List<Location> actualPath) {
+    	int hoverTime = 1;
+    	for(int i = actualPath.size() - 1; i > 0; i--) {
+    		if(actualPath.get(i).equals(actualPath.get(i-1))) {
+    			hoverTime++;
+    		} else {
+    			break;
+    		}
+    	}
+    	return hoverTime;
+    } 
 
 }

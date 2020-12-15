@@ -5,16 +5,20 @@ import java.util.List;
 
 public class Package {
 	
+	/**
+	 * Status of the drones
+	 */
 	public enum Status {
 		UNDELIVERED, IN_TRANSIT, DELIVERED
 	}
 	
-	private Location destination;
-	private double weight;
-	private String packageID;
+	private Location pickup;    // pickup/source location of the package
+	private Location destination; // destination of the package to deliver
+	private double weight;     // weight of the package 
+	private String packageID;   // id of the package
 	Status status;
 	
-	private List<Location> path;
+	private List<Location> path;  // holds the path of the package from source to destination
 
 	public Package(String packageID, Location pickup, Location destination, double weight) {
 		this.packageID = packageID;
@@ -33,7 +37,7 @@ public class Package {
 	}
 
 	/**
-	 * @param weight the weight to set
+	 * @param set the weight
 	 */
 	public void setWeight(double weight) {
 		this.weight = weight;
@@ -47,7 +51,7 @@ public class Package {
 	}
 
 	/**
-	 * @param packageID the packageID to set
+	 * @param set the packageID
 	 */
 	public void setPackageID(String packageID) {
 		this.packageID = packageID;
@@ -61,7 +65,7 @@ public class Package {
 	}
 
 	/**
-	 * @param status the status to set
+	 * @param set the status
 	 */
 	public void setStatus(Status status) {
 		this.status = status;
@@ -75,13 +79,12 @@ public class Package {
 	}
 
 	/**
-	 * @param path the path to set
+	 * @param set the path
 	 */
 	public void setPath(List<Location> path) {
 		this.path = path;
 	}
 	
-	private Location pickup;
 	/**
 	 * @return the pickup
 	 */
@@ -90,7 +93,7 @@ public class Package {
 	}
 
 	/**
-	 * @param pickup the pickup to set
+	 * @param set the pickup location
 	 */
 	public void setPickup(Location pickup) {
 		this.pickup = pickup;
@@ -104,12 +107,16 @@ public class Package {
 	}
 
 	/**
-	 * @param destination the destination to set
+	 * @param sets the destination location
 	 */
 	public void setDestination(Location destination) {
 		this.destination = destination;
 	}
 	
+	/**
+	 * Add location traversed by the package to the path
+	 * @param location
+	 */
 	public void addLoctionToPath(Location location) {
 		path.add(location);
 	}

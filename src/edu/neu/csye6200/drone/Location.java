@@ -2,72 +2,81 @@ package edu.neu.csye6200.drone;
 
 public class Location {
 	
-	 public int x;  // x-coordinate
-	 public int y;  // y-coordinate
-	 private boolean vacant;
-	 public Location parent;
+	public enum Entity {
+		FREE, OBSTACLE, PKG_SRC, PKG_DEST, DRONE_IDLE, DRONE_INTRANSIT, DRONE_TRACE
+	}
+	
+	public int x;  // x-coordinate
+	public int y;  // y-coordinate
+	private boolean vacant; // sets to false if location is blocked or drone in-transit
+	public Location parent; // holds previous location
+	private Entity entity;
+	 
 
 	public Location(int x, int y) {
 		this.x = x;
 		this.y = y;
-		this.vacant = true;
+		this.vacant = true;  // every location is set to vacant
+		this.entity = Entity.FREE;
 	}
 	
-	
-	
 	/**
-	 * @return the x
+	 * @return the x-coordinate
 	 */
 	public int getX() {
 		return x;
 	}
 
-
-
 	/**
-	 * @param x the x to set
+	 * @param set the x-coordinate
 	 */
 	public void setX(int x) {
 		this.x = x;
 	}
 
-
-
 	/**
-	 * @return the y
+	 * @return the y-coordinate
 	 */
 	public int getY() {
 		return y;
 	}
 
-
-
 	/**
-	 * @param y the y to set
+	 * @param set the y-coordinate
 	 */
 	public void setY(int y) {
 		this.y = y;
 	}
 
-
-
 	/**
-	 * @return the vacant
+	 * @returns vacant
 	 */
 	public boolean isVacant() {
 		return vacant;
 	}
 
-
-
 	/**
-	 * @param vacant the vacant to set
+	 * @param  set the vacant
 	 */
 	public void setVacant(boolean vacant) {
 		this.vacant = vacant;
 	}
-
-
+    
+	/**
+	 * 
+	 * @return Entity
+	 */
+	public Entity getEntity() {
+		return entity;
+	}
+    
+	/**
+	 * Set the Entity
+	 * @param entity
+	 */
+	public void setEntity(Entity entity) {
+		this.entity = entity;
+	}
 
 	/**
 	 * @return the parent
@@ -76,17 +85,14 @@ public class Location {
 		return parent;
 	}
 
-
-
 	/**
-	 * @param parent the parent to set
+	 * @param set the parent
 	 */
 	public void setParent(Location parent) {
 		this.parent = parent;
 	}
-
-
-
+    
+	@Override
 	public String toString() {
 		return "(" + x + ", " + y +")";
 	}

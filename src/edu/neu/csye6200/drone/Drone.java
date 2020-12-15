@@ -3,33 +3,57 @@ package edu.neu.csye6200.drone;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.neu.csye6200.drone.rules.MovementRule;
+import edu.neu.csye6200.drone.rules.DDRule;
 
 public class Drone {
-	
+
 	public enum Status {
 		AVAILABLE, UNAVAILABLE
 	}
 	
-	private String droneID;
-	private double cargoCapacity;
-	private MovementRule movementRule;
-	private Status status;
-	private List<Location> projectedPath;
-	private List<Location> actualPath;
-	private int currentIndex;
-	private Package pkg;
+	private String droneID;  // id of the drone
+	private double cargoCapacity; // cargo capacity of the drone
+	private DDRule rule;         // movement rule
+	private Status status;       
+	private List<Location> projectedPath;  // initial path calculated for the drone to deliver a package
+	private List<Location> actualPath;    // actual path taken by drone to deliver a package
+	private int currentIndex;            // index of the current position of the drone
+	private Package pkg;   // Package that the drone is assigned  
+	private Location idleLocation; // Location where the drone sits when it is idle
 	
-	
-	public Drone(String droneID, double cargoCapacity, MovementRule movementRule) {
+	/**
+	 * Parameterized Constructor for creating drone
+	 * @param droneID
+	 * @param cargoCapacity
+	 * @param rule
+	 * @param idleLocation
+	 */
+	public Drone(String droneID, double cargoCapacity, DDRule rule, Location idleLocation) {
 		this.droneID = droneID;
 		this.cargoCapacity = cargoCapacity;
-	    this.movementRule = movementRule;
-		this.status = Status.AVAILABLE;
-        projectedPath = new ArrayList<>();
-        actualPath = new ArrayList<>();
+	    this.rule = rule;
+		this.status = Status.AVAILABLE;  // set the status of the drone AVAILABLE initially
+        this.projectedPath = new ArrayList<>(); 
+        this.actualPath = new ArrayList<>();
+        this.idleLocation = idleLocation;
 	}
 	
+    /**
+     * 
+     * @return idle location
+     */
+	public Location getIdleLocation() {
+		return idleLocation;
+	}
+
+    /**
+     * 
+     * @param set idleLocation
+     */
+	public void setIdleLocation(Location idleLocation) {
+		this.idleLocation = idleLocation;
+	}
+
 
 	/**
 	 * @return the droneID
@@ -38,16 +62,12 @@ public class Drone {
 		return droneID;
 	}
 
-
-
 	/**
-	 * @param droneID the droneID to set
+	 * @param set the droneID
 	 */
 	public void setDroneID(String droneID) {
 		this.droneID = droneID;
 	}
-
-
 
 	/**
 	 * @return the cargoCapacity
@@ -56,43 +76,33 @@ public class Drone {
 		return cargoCapacity;
 	}
 
-
-
 	/**
-	 * @param cargoCapacity the cargoCapacity to set
+	 * @param set the cargoCapacity
 	 */
 	public void setCargoCapacity(double cargoCapacity) {
 		this.cargoCapacity = cargoCapacity;
 	}
 
-
-
 	/**
-	 * @return the movementRule
+	 * @return the rule
 	 */
-	public MovementRule getMovementRule() {
-		return movementRule;
+	public DDRule getRule() {
+		return rule;
 	}
 
-
-
 	/**
-	 * @param movementRule the movementRule to set
+	 * @param set the movementRule
 	 */
-	public void setMovementRule(MovementRule movementRule) {
-		this.movementRule = movementRule;
+	public void setRule(DDRule rule) {
+		this.rule = rule;
 	}
 
-
-
 	/**
-	 * @param actualPath the actualPath to set
+	 * @param set the actualPath
 	 */
 	public void setActualPath(List<Location> actualPath) {
 		this.actualPath = actualPath;
 	}
-
-
 
 	/**
 	 * @return the status
@@ -101,16 +111,12 @@ public class Drone {
 		return status;
 	}
 
-
-
 	/**
-	 * @param status the status to set
+	 * @param set the status
 	 */
 	public void setStatus(Status status) {
 		this.status = status;
 	}
-
-
 
 	/**
 	 * @return the currentIndex
@@ -119,16 +125,12 @@ public class Drone {
 		return currentIndex;
 	}
 
-
-
 	/**
-	 * @param currentIndex the currentIndex to set
+	 * @param set the currentIndex
 	 */
 	public void setCurrentIndex(int currentIndex) {
 		this.currentIndex = currentIndex;
-	}
-	
-	
+	}	
 	
 	/**
 	 * @return the pkg
@@ -137,16 +139,12 @@ public class Drone {
 		return pkg;
 	}
 
-
-
 	/**
-	 * @param pkg the pkg to set
+	 * @param set the pkg
 	 */
 	public void setPkg(Package pkg) {
 		this.pkg = pkg;
 	}
-
-
 
 	/**
 	 * @return the projectedPath
@@ -155,16 +153,12 @@ public class Drone {
 		return projectedPath;
 	}
 
-
-
 	/**
-	 * @param projectedPath the projectedPath to set
+	 * @param set the projectedPath
 	 */
 	public void setProjectedPath(List<Location> projectedPath) {
 		this.projectedPath = projectedPath;
 	}
-
-
 
 	/**
 	 * @return the actualPath
@@ -173,12 +167,12 @@ public class Drone {
 		return actualPath;
 	}
 
-
-
+    /**
+     * Method to add location to actual path
+     * @param location
+     */
 	public void addToActualPath(Location location) {
-		projectedPath.add(location);
-	}
-	
-	
+		actualPath.add(location);
+	}	
 
 }
